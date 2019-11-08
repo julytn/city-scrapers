@@ -1,6 +1,7 @@
-from city_scrapers_core.constants import NOT_CLASSIFIED
+from city_scrapers_core.constants import COMMISSION
 from city_scrapers_core.items import Meeting
 from city_scrapers_core.spiders import CityScrapersSpider
+from datetime import datetime
 
 
 class ChiSsa4Spider(CityScrapersSpider):
@@ -47,11 +48,21 @@ class ChiSsa4Spider(CityScrapersSpider):
 
     def _parse_classification(self, item):
         """Parse or generate classification from allowed options."""
-        return NOT_CLASSIFIED
+        return COMMISSION
 
     def _parse_start(self, item):
-        """Parse start datetime as a naive datetime object."""
-        return None
+        """
+        Parse start datetime as a naive datetime object.
+        Example format: September 25 @ 8:00 am - 9:00 am
+        """
+        start = item.css(".tribe-event-date-start::text").get()
+        if ',' not in start: # It does not have a year because it is the current year
+            today = datetime.today()
+            start_datetime = datetime.strptime(start, '%B %d @ %H:%M %p').replace(year=today.year)
+        else:
+            start_datetime = datetime.strptime(start, '%B %d, %Y @ %H:%M %p')
+        print(start_datetime)
+        return start_datetime
 
     def _parse_end(self, item):
         """Parse end datetime as a naive datetime object. Added by pipeline if None"""
