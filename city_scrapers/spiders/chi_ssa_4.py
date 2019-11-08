@@ -42,7 +42,8 @@ class ChiSsa4Spider(CityScrapersSpider):
 
     def _parse_description(self, item):
         """Parse or generate meeting description."""
-        return ""
+        description = item.css(".tribe-events-list-event-description > p::text").get()
+        return description
 
     def _parse_classification(self, item):
         """Parse or generate classification from allowed options."""
